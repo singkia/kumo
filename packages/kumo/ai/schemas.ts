@@ -444,6 +444,7 @@ export const CollapsiblePropsSchema = z.object({
 });
 
 export const ComboboxPropsSchema = z.object({
+  size: z.enum(["xs", "sm", "base", "lg"]).optional(), // Size of the combobox trigger. Matches Input component sizes. - `"xs"` — Extra small for compact UIs (h-5 / 20px) - `"sm"` — Small for secondary fields (h-6.5 / 26px) - `"base"` — Default size (h-9 / 36px) - `"lg"` — Large for prominent fields (h-10 / 40px)
   inputSide: z.enum(["right", "top"]).optional(), // Position of the text input relative to chips in multi-select mode. - `"right"` — Input inline to the right of chips - `"top"` — Input above chips
   items: z.array(z.unknown()), // Array of items to display in the dropdown
   value: z.array(z.unknown()).optional(), // Currently selected value(s)

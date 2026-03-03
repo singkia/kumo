@@ -1173,6 +1173,12 @@ Combobox — autocomplete input with filterable dropdown list.  Compound compone
 
 **Props:**
 
+- `size`: enum [default: base]
+  Size of the combobox trigger. Matches Input component sizes.
+- `"xs"` — Extra small for compact UIs (h-5 / 20px)
+- `"sm"` — Small for secondary fields (h-6.5 / 26px)
+- `"base"` — Default size (h-9 / 36px)
+- `"lg"` — Large for prominent fields (h-10 / 40px)
 - `inputSide`: enum [default: right]
   - `"right"`: Input positioned inline to the right of chips
   - `"top"`: Input positioned above chips
@@ -1429,6 +1435,90 @@ Usage:
             {(item: DatabaseItem) => (
               <Combobox.Item key={item.value} value={item}>
                 {item.label}
+              </Combobox.Item>
+            )}
+          </Combobox.List>
+        </Combobox.Content>
+      </Combobox>
+    </div>
+```
+
+```tsx
+<div className="flex flex-wrap items-center gap-4">
+      <Combobox
+        size="sm"
+        value={smValue}
+        onValueChange={(v) => setSmValue(v as string | null)}
+        items={fruits.slice(0, 8)}
+      >
+        <Combobox.TriggerInput placeholder="Small (sm)" />
+        <Combobox.Content>
+          <Combobox.Empty />
+          <Combobox.List>
+            {(item: string) => (
+              <Combobox.Item key={item} value={item}>
+                {item}
+              </Combobox.Item>
+            )}
+          </Combobox.List>
+        </Combobox.Content>
+      </Combobox>
+      <Combobox
+        size="base"
+        value={baseValue}
+        onValueChange={(v) => setBaseValue(v as string | null)}
+        items={fruits.slice(0, 8)}
+      >
+        <Combobox.TriggerInput placeholder="Base (default)" />
+        <Combobox.Content>
+          <Combobox.Empty />
+          <Combobox.List>
+            {(item: string) => (
+              <Combobox.Item key={item} value={item}>
+                {item}
+              </Combobox.Item>
+            )}
+          </Combobox.List>
+        </Combobox.Content>
+      </Combobox>
+    </div>
+```
+
+```tsx
+<div className="flex flex-wrap items-center gap-4">
+      <Combobox
+        size="sm"
+        value={smValue}
+        onValueChange={(v) => setSmValue(v as Language)}
+        items={languages}
+      >
+        <Combobox.TriggerValue className="w-[160px]" />
+        <Combobox.Content>
+          <Combobox.Input placeholder="Search" />
+          <Combobox.Empty />
+          <Combobox.List>
+            {(item: Language) => (
+              <Combobox.Item key={item.value} value={item}>
+                {item.emoji} {item.label}
+              </Combobox.Item>
+            )}
+          </Combobox.List>
+        </Combobox.Content>
+      </Combobox>
+      <Combobox
+        size="base"
+        value={baseValue}
+        onValueChange={(v) => setBaseValue(v as Language)}
+        items={languages}
+      >
+        <Combobox.TriggerValue className="w-[180px]" />
+        <Combobox.Content>
+          <Combobox.Input placeholder="Search" />
+          <Combobox.Empty />
+          <Combobox.List>
+            {(item: Language) => (
+              <Combobox.Item key={item.value} value={item}>
+                {item.emoji} {item.label}
               </Combobox.Item>
             )}
           </Combobox.List>
@@ -3292,7 +3382,7 @@ Progress bar showing a measured value within a known range (e.g. quota usage).
 <Meter
       label="Upload progress"
       value={80}
-      indicatorClassName="from-green-500 via-green-500 to-green-500"
+      indicatorClassName="from-kumo-success via-kumo-success to-kumo-success"
     />
 ```
 
@@ -3819,7 +3909,7 @@ Select component
 
 **Colors (kumo tokens used):**
 
-`bg-kumo-control`, `bg-kumo-overlay`, `ring-kumo-line`, `ring-kumo-ring`, `text-kumo-default`
+`bg-kumo-control`, `bg-kumo-overlay`, `ring-kumo-line`, `ring-kumo-ring`, `text-kumo-default`, `text-kumo-subtle`
 
 **Styling:**
 
@@ -3831,6 +3921,14 @@ This is a compound component. Use these sub-components:
 #### Select.Option
 
 Option sub-component
+
+#### Select.Group
+
+Group sub-component
+
+#### Select.GroupLabel
+
+GroupLabel sub-component
 
 
 **Examples:**
@@ -3901,6 +3999,23 @@ Option sub-component
       <Select.Option value="Read">Read</Select.Option>
       <Select.Option value="Write">Write</Select.Option>
       <Select.Option value="CreatedAt">Created At</Select.Option>
+    </Select>
+```
+
+```tsx
+<Select className="w-[240px]" value={value} onValueChange={(v) => setValue(v as string)}>
+      {groupedDevices.map((group) => (
+        <Select.Group key={group.category}>
+          {shouldShowGroupLabel && (
+            <Select.GroupLabel>{group.category}</Select.GroupLabel>
+          )}
+          {group.items.map((device) => (
+            <Select.Option key={device} value={device}>
+              {device}
+            </Select.Option>
+          ))}
+        </Select.Group>
+      ))}
     </Select>
 ```
 

@@ -2036,6 +2036,18 @@
       "importPath": "@cloudflare/kumo",
       "category": "Input",
       "props": {
+        "size": {
+          "type": "enum",
+          "optional": true,
+          "description": "Size of the combobox trigger. Matches Input component sizes.\n- `\"xs\"` — Extra small for compact UIs (h-5 / 20px)\n- `\"sm\"` — Small for secondary fields (h-6.5 / 26px)\n- `\"base\"` — Default size (h-9 / 36px)\n- `\"lg\"` — Large for prominent fields (h-10 / 40px)",
+          "values": [
+            "xs",
+            "sm",
+            "base",
+            "lg"
+          ],
+          "default": "base"
+        },
         "inputSide": {
           "type": "enum",
           "optional": true,
@@ -2114,7 +2126,9 @@
         "<Combobox\n      value={value}\n      onValueChange={(v) => setValue(v as ServerLocation | null)}\n      items={servers}\n    >\n      <Combobox.TriggerInput\n        className=\"w-[200px]\"\n        placeholder=\"Select server\"\n      />\n      <Combobox.Content>\n        <Combobox.Empty />\n        <Combobox.List>\n          {(group: ServerLocationGroup) => (\n            <Combobox.Group key={group.value} items={group.items}>\n              <Combobox.GroupLabel>{group.value}</Combobox.GroupLabel>\n              <Combobox.Collection>\n                {(item: ServerLocation) => (\n                  <Combobox.Item key={item.value} value={item}>\n                    {item.label}\n                  </Combobox.Item>\n                )}\n              </Combobox.Collection>\n            </Combobox.Group>\n          )}\n        </Combobox.List>\n      </Combobox.Content>\n    </Combobox>",
         "<div className=\"flex gap-2\">\n      <Combobox\n        value={value}\n        onValueChange={setValue}\n        items={bots}\n        isItemEqualToValue={(bot: BotItem, selected: BotItem) =>\n          bot.value === selected.value\n        }\n        multiple\n      >\n        <Combobox.TriggerMultipleWithInput\n          className=\"w-[400px]\"\n          placeholder=\"Select bots\"\n          renderItem={(selected: BotItem) => (\n            <Combobox.Chip key={selected.value}>{selected.label}</Combobox.Chip>\n          )}\n          inputSide=\"right\"\n        />\n        <Combobox.Content className=\"max-h-[200px] min-w-auto overflow-y-auto\">\n          <Combobox.Empty />\n          <Combobox.List>\n            {(item: BotItem) => (\n              <Combobox.Item key={item.value} value={item}>\n                <div className=\"flex gap-2\">\n                  <Text>{item.label}</Text>\n                  <Text variant=\"secondary\">{item.author}</Text>\n                </div>\n              </Combobox.Item>\n            )}\n          </Combobox.List>\n        </Combobox.Content>\n      </Combobox>\n      <Button variant=\"primary\">Submit</Button>\n    </div>",
         "<div className=\"w-80\">\n      <Combobox\n        items={databases}\n        value={value}\n        onValueChange={setValue}\n        label=\"Database\"\n        description=\"Select your preferred database\"\n      >\n        <Combobox.TriggerInput placeholder=\"Select database\" />\n        <Combobox.Content>\n          <Combobox.Empty />\n          <Combobox.List>\n            {(item: DatabaseItem) => (\n              <Combobox.Item key={item.value} value={item}>\n                {item.label}\n              </Combobox.Item>\n            )}\n          </Combobox.List>\n        </Combobox.Content>\n      </Combobox>\n    </div>",
-        "<div className=\"w-80\">\n      <Combobox\n        items={databases}\n        value={value}\n        onValueChange={setValue}\n        label=\"Database\"\n        error={{ message: \"Please select a database\", match: true }}\n      >\n        <Combobox.TriggerInput placeholder=\"Select database\" />\n        <Combobox.Content>\n          <Combobox.Empty />\n          <Combobox.List>\n            {(item: DatabaseItem) => (\n              <Combobox.Item key={item.value} value={item}>\n                {item.label}\n              </Combobox.Item>\n            )}\n          </Combobox.List>\n        </Combobox.Content>\n      </Combobox>\n    </div>"
+        "<div className=\"w-80\">\n      <Combobox\n        items={databases}\n        value={value}\n        onValueChange={setValue}\n        label=\"Database\"\n        error={{ message: \"Please select a database\", match: true }}\n      >\n        <Combobox.TriggerInput placeholder=\"Select database\" />\n        <Combobox.Content>\n          <Combobox.Empty />\n          <Combobox.List>\n            {(item: DatabaseItem) => (\n              <Combobox.Item key={item.value} value={item}>\n                {item.label}\n              </Combobox.Item>\n            )}\n          </Combobox.List>\n        </Combobox.Content>\n      </Combobox>\n    </div>",
+        "<div className=\"flex flex-wrap items-center gap-4\">\n      <Combobox\n        size=\"sm\"\n        value={smValue}\n        onValueChange={(v) => setSmValue(v as string | null)}\n        items={fruits.slice(0, 8)}\n      >\n        <Combobox.TriggerInput placeholder=\"Small (sm)\" />\n        <Combobox.Content>\n          <Combobox.Empty />\n          <Combobox.List>\n            {(item: string) => (\n              <Combobox.Item key={item} value={item}>\n                {item}\n              </Combobox.Item>\n            )}\n          </Combobox.List>\n        </Combobox.Content>\n      </Combobox>\n      <Combobox\n        size=\"base\"\n        value={baseValue}\n        onValueChange={(v) => setBaseValue(v as string | null)}\n        items={fruits.slice(0, 8)}\n      >\n        <Combobox.TriggerInput placeholder=\"Base (default)\" />\n        <Combobox.Content>\n          <Combobox.Empty />\n          <Combobox.List>\n            {(item: string) => (\n              <Combobox.Item key={item} value={item}>\n                {item}\n              </Combobox.Item>\n            )}\n          </Combobox.List>\n        </Combobox.Content>\n      </Combobox>\n    </div>",
+        "<div className=\"flex flex-wrap items-center gap-4\">\n      <Combobox\n        size=\"sm\"\n        value={smValue}\n        onValueChange={(v) => setSmValue(v as Language)}\n        items={languages}\n      >\n        <Combobox.TriggerValue className=\"w-[160px]\" />\n        <Combobox.Content>\n          <Combobox.Input placeholder=\"Search\" />\n          <Combobox.Empty />\n          <Combobox.List>\n            {(item: Language) => (\n              <Combobox.Item key={item.value} value={item}>\n                {item.emoji} {item.label}\n              </Combobox.Item>\n            )}\n          </Combobox.List>\n        </Combobox.Content>\n      </Combobox>\n      <Combobox\n        size=\"base\"\n        value={baseValue}\n        onValueChange={(v) => setBaseValue(v as Language)}\n        items={languages}\n      >\n        <Combobox.TriggerValue className=\"w-[180px]\" />\n        <Combobox.Content>\n          <Combobox.Input placeholder=\"Search\" />\n          <Combobox.Empty />\n          <Combobox.List>\n            {(item: Language) => (\n              <Combobox.Item key={item.value} value={item}>\n                {item.emoji} {item.label}\n              </Combobox.Item>\n            )}\n          </Combobox.List>\n        </Combobox.Content>\n      </Combobox>\n    </div>"
       ],
       "colors": [
         "bg-kumo-control",
@@ -3452,7 +3466,7 @@
         "<Meter label=\"Progress\" value={40} showValue={false} />",
         "<Meter label=\"Quota reached\" value={100} />",
         "<Meter label=\"Memory usage\" value={15} />",
-        "<Meter\n      label=\"Upload progress\"\n      value={80}\n      indicatorClassName=\"from-green-500 via-green-500 to-green-500\"\n    />"
+        "<Meter\n      label=\"Upload progress\"\n      value={80}\n      indicatorClassName=\"from-kumo-success via-kumo-success to-kumo-success\"\n    />"
       ],
       "colors": [
         "bg-kumo-fill",
@@ -3854,6 +3868,7 @@
         "<Select className=\"w-[200px]\" loading />",
         "<Select\n      className=\"w-[200px]\"\n      loading={loading}\n      value={value}\n      onValueChange={(v) => setValue(v as string | null)}\n      placeholder=\"Please select\"\n      items={items}\n    />",
         "<Select\n      className=\"w-[250px]\"\n      multiple\n      renderValue={(value) => {\n        if (value.length > 3) {\n          return (\n            <span className=\"line-clamp-1\">\n              {value.slice(2).join(\", \") + ` and ${value.length - 2} more`}\n            </span>\n          );\n        }\n        return <span>{value.join(\", \")}</span>;\n      }}\n      value={value}\n      onValueChange={(v) => setValue(v as string[])}\n    >\n      <Select.Option value=\"Name\">Name</Select.Option>\n      <Select.Option value=\"Location\">Location</Select.Option>\n      <Select.Option value=\"Size\">Size</Select.Option>\n      <Select.Option value=\"Read\">Read</Select.Option>\n      <Select.Option value=\"Write\">Write</Select.Option>\n      <Select.Option value=\"CreatedAt\">Created At</Select.Option>\n    </Select>",
+        "<Select className=\"w-[240px]\" value={value} onValueChange={(v) => setValue(v as string)}>\n      {groupedDevices.map((group) => (\n        <Select.Group key={group.category}>\n          {shouldShowGroupLabel && (\n            <Select.GroupLabel>{group.category}</Select.GroupLabel>\n          )}\n          {group.items.map((device) => (\n            <Select.Option key={device} value={device}>\n              {device}\n            </Select.Option>\n          ))}\n        </Select.Group>\n      ))}\n    </Select>",
         "<Select\n      className=\"w-[200px]\"\n      onValueChange={(v) => setValue(v as (typeof authors)[0] | null)}\n      value={value}\n      isItemEqualToValue={(item, value) => item?.id === value?.id}\n      renderValue={(author) => {\n        return author?.name ?? \"Please select author\";\n      }}\n    >\n      {authors.map((author) => (\n        <Select.Option key={author.id} value={author}>\n          <div className=\"flex w-[300px] items-center justify-between gap-2\">\n            <Text>{author.name}</Text>\n            <Text variant=\"secondary\">{author.title}</Text>\n          </div>\n        </Select.Option>\n      ))}\n    </Select>"
       ],
       "colors": [
@@ -3861,12 +3876,23 @@
         "bg-kumo-overlay",
         "ring-kumo-line",
         "ring-kumo-ring",
-        "text-kumo-default"
+        "text-kumo-default",
+        "text-kumo-subtle"
       ],
       "subComponents": {
         "Option": {
           "name": "Option",
           "description": "Option sub-component",
+          "props": {}
+        },
+        "Group": {
+          "name": "Group",
+          "description": "Group sub-component",
+          "props": {}
+        },
+        "GroupLabel": {
+          "name": "GroupLabel",
+          "description": "GroupLabel sub-component",
           "props": {}
         }
       },

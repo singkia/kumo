@@ -149,6 +149,44 @@ export function SelectMultipleDemo() {
   );
 }
 
+const groupedDevices = [
+  {
+    category: "iPhone",
+    items: ["iPhone 16 Pro", "iPhone 16", "iPhone 15"],
+  },
+  {
+    category: "Android",
+    items: ["Pixel 9 Pro", "Galaxy S25", "Xiaomi 15"],
+  },
+  {
+    category: "iPad",
+    items: ["iPad Pro 13", "iPad Air 11"],
+  },
+] as const;
+
+const shouldShowGroupLabel = groupedDevices.length > 1;
+
+export function SelectGroupedDemo() {
+  const [value, setValue] = useState<string>(groupedDevices[0].items[0]);
+
+  return (
+    <Select className="w-[240px]" value={value} onValueChange={(v) => setValue(v as string)}>
+      {groupedDevices.map((group) => (
+        <Select.Group key={group.category}>
+          {shouldShowGroupLabel && (
+            <Select.GroupLabel>{group.category}</Select.GroupLabel>
+          )}
+          {group.items.map((device) => (
+            <Select.Option key={device} value={device}>
+              {device}
+            </Select.Option>
+          ))}
+        </Select.Group>
+      ))}
+    </Select>
+  );
+}
+
 const authors = [
   { id: 1, name: "John Doe", title: "Programmer" },
   { id: 2, name: "Alice Smith", title: "Software Engineer" },

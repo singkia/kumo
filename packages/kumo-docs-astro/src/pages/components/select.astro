@@ -13,6 +13,7 @@ import {
   SelectLoadingDemo,
   SelectLoadingDataDemo,
   SelectMultipleDemo,
+  SelectGroupedDemo,
   SelectComplexDemo,
 } from "../../components/demos/SelectDemo";
 ---
@@ -319,6 +320,46 @@ function App() {
 }`}
     >
       <SelectMultipleDemo client:load />
+    </ComponentExample>
+  </ComponentSection>
+
+  <!-- Grouped Items -->
+  <ComponentSection>
+    <Heading level={3}>Grouped Items</Heading>
+    <p class="mb-4 flex flex-col gap-4">
+      <span class="text-kumo-strong">
+        Use <code class="rounded bg-kumo-control px-1 py-0.5 text-sm">Select.Group</code> and
+        <code class="rounded bg-kumo-control px-1 py-0.5 text-sm">Select.GroupLabel</code> to
+        organize long option lists by category without importing Base UI primitives directly.
+      </span>
+    </p>
+
+    <ComponentExample
+      code={`function App() {
+  const [value, setValue] = useState("iPhone 16 Pro");
+  const groups = [
+    { category: "iPhone", items: ["iPhone 16 Pro", "iPhone 16", "iPhone 15"] },
+    { category: "Android", items: ["Pixel 9 Pro", "Galaxy S25", "Xiaomi 15"] },
+    { category: "iPad", items: ["iPad Pro 13", "iPad Air 11"] },
+  ];
+
+  return (
+    <Select className="w-[240px]" value={value} onValueChange={(v) => setValue(v as string)}>
+      {groups.map((group) => (
+        <Select.Group key={group.category}>
+          <Select.GroupLabel>{group.category}</Select.GroupLabel>
+          {group.items.map((item) => (
+            <Select.Option key={item} value={item}>
+              {item}
+            </Select.Option>
+          ))}
+        </Select.Group>
+      ))}
+    </Select>
+  );
+}`}
+    >
+      <SelectGroupedDemo client:load />
     </ComponentExample>
   </ComponentSection>
 

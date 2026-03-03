@@ -106,4 +106,68 @@ describe("Select", () => {
       expect(screen.queryByText("Select your preferred database")).toBeNull();
     });
   });
+
+  describe("compound group API", () => {
+    it("exposes Group and GroupLabel compound components", () => {
+      expect(Select.Group).toBeDefined();
+      expect(Select.GroupLabel).toBeDefined();
+    });
+
+    it("renders grouped options via Select compound API", () => {
+      expect(() =>
+        render(
+          <Select defaultValue="iphone-16">
+            <Select.Group>
+              <Select.GroupLabel>iPhone</Select.GroupLabel>
+              <Select.Option value="iphone-16">iPhone 16</Select.Option>
+            </Select.Group>
+            <Select.Group>
+              <Select.GroupLabel>Android</Select.GroupLabel>
+              <Select.Option value="pixel-9">Pixel 9</Select.Option>
+            </Select.Group>
+          </Select>,
+        ),
+      ).not.toThrow();
+    });
+  });
+
+  describe("items and placeholder behavior", () => {
+    it("accepts placeholder with object items", () => {
+      expect(() =>
+        render(
+          <Select
+            placeholder="Select device"
+            items={{ iphone: "iPhone", android: "Android" }}
+          />,
+        ),
+      ).not.toThrow();
+    });
+
+    it("accepts placeholder with array items", () => {
+      expect(() =>
+        render(
+          <Select
+            placeholder="Select framework"
+            items={[
+              { value: "react", label: "React" },
+              { value: "vue", label: "Vue" },
+            ]}
+          />,
+        ),
+      ).not.toThrow();
+    });
+
+    it("prefers explicit children over auto-generated items", () => {
+      expect(() =>
+        render(
+          <Select
+            placeholder="Select runtime"
+            items={{ node: "Node.js", deno: "Deno" }}
+          >
+            <Select.Option value="bun">Bun</Select.Option>
+          </Select>,
+        ),
+      ).not.toThrow();
+    });
+  });
 });

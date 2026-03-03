@@ -68,22 +68,39 @@ export function selectVariants(_props: KumoSelectVariantsProps = {}) {
  * Only used when children are not explicitly provided.
  * Filters out null values (typically used for placeholders).
  */
-function renderOptionsFromItems<T>(
-  items:
-    | Record<string, ReactNode>
-    | ReadonlyArray<{ label: ReactNode; value: T }>,
-): ReactNode {
-  // Handle object map format: { key: "Label" }
-  if (!Array.isArray(items)) {
-    return Object.entries(items).map(([key, label]) => (
-      <Option key={key} value={key as T}>
-        {label}
-      </Option>
-    ));
+type SelectItem<T> = { label: ReactNode; value: T };
+type SelectItems<T> = Record<string, ReactNode> | ReadonlyArray<SelectItem<T>>;
+
+function normalizeItems<T>(items: SelectItems<T>): SelectItem<T>[] {
+  if (Array.isArray(items)) {
+    return [...items];
   }
 
-  // Handle array format: [{ value, label }] - filter out null values
-  return items
+  return Object.entries(items).map(([key, label]) => ({
+    value: key as T,
+    label,
+  }));
+}
+
+function resolveItemsWithPlaceholder<T>(
+  items: SelectItems<T> | undefined,
+  placeholder: string | undefined,
+): SelectItems<T> | undefined {
+  if (!placeholder) {
+    return items;
+  }
+
+  return [
+    {
+      value: null as T,
+      label: placeholder,
+    },
+    ...(items ? normalizeItems(items) : []),
+  ];
+}
+
+function renderOptionsFromItems<T>(items: SelectItems<T>): ReactNode {
+  return normalizeItems(items)
     .filter((item) => item.value !== null)
     .map((item, index) => (
       <Option
@@ -206,47 +223,19 @@ export function Select<T, Multiple extends boolean | undefined = false>({
   const triggerAriaLabel =
     ariaLabel ?? (!triggerLabelledBy ? fallbackLabel : undefined);
 
-  // Placeholder must be provide via the items props
-  // We need to fake the items or do some transformation
-  let items = props.items;
-  if (placeholder) {
-    if (!items) {
-      items = [
-        {
-          value: null as T,
-          label: placeholder,
-        },
-      ];
-    } else if (typeof items === "object") {
-      items = [
-        {
-          value: null as T,
-          label: placeholder,
-        },
-        ...Object.entries(items).map(([key, value]) => ({
-          value: key as T,
-          label: value,
-        })),
-      ];
-    } else if (Array.isArray(items)) {
-      items = [
-        {
-          value: null as T,
-          label: placeholder,
-        },
-        ...items,
-      ];
-    }
-  }
+  const resolvedItems = resolveItemsWithPlaceholder(
+    props.items as SelectItems<T> | undefined,
+    placeholder,
+  );
 
   // Auto-render children from items if children not provided
   const renderedChildren =
-    children ?? (items ? renderOptionsFromItems(items) : null);
+    children ?? (resolvedItems ? renderOptionsFromItems(resolvedItems) : null);
 
   const selectControl = (
     <SelectBase.Root
       {...props}
-      items={items}
+      items={resolvedItems}
       disabled={loading || props.disabled}
     >
       <SelectBase.Trigger
@@ -343,6 +332,29 @@ type OptionProps<T> = {
   value: T;
 };
 
+type GroupProps = SelectBase.Group.Props;
+
+function Group({ className, ...props }: GroupProps & { className?: string }) {
+  return <SelectBase.Group {...props} className={className} />;
+}
+
+type GroupLabelProps = SelectBase.GroupLabel.Props;
+
+function GroupLabel({
+  className,
+  ...props
+}: GroupLabelProps & { className?: string }) {
+  return (
+    <SelectBase.GroupLabel
+      {...props}
+      className={cn(
+        "select-none px-2 py-1.5 text-base font-medium text-kumo-subtle",
+        className,
+      )}
+    />
+  );
+}
+
 function Option<T>({ children, value }: OptionProps<T>) {
   return (
     <SelectBase.Item
@@ -358,3 +370,5 @@ function Option<T>({ children, value }: OptionProps<T>) {
 }
 
 Select.Option = Option;
+Select.Group = Group;
+Select.GroupLabel = GroupLabel;
