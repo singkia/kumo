@@ -204,6 +204,12 @@ export {
 } from "./components/date-picker";
 
 export { Flow } from "./components/flow";
+export {
+  ColorPicker,
+  type ColorPickerProps,
+  KUMO_COLOR_PICKER_VARIANTS,
+  KUMO_COLOR_PICKER_DEFAULT_VARIANTS,
+} from "./components/color-picker";
 // PLOP_INJECT_EXPORT
 
 // Utils
