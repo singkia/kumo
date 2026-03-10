@@ -1,8 +1,21 @@
 "use client";
 
+/**
+ * [INPUT]: 依赖 react 的 useState，依赖 @cloudflare/kumo 的 DatePicker/Popover/Button 组合能力
+ * [OUTPUT]: 对外提供 DatePicker 文档页的所有 demo 组件
+ * [POS]: kumo-docs-astro/components/demos 的 DatePicker 示例集合，展示推荐交互而不是底层原始状态机
+ * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ */
+
 import { useState } from "react";
 import { DatePicker, Popover, Button, type DateRange } from "@cloudflare/kumo";
 import { CalendarDotsIcon } from "@phosphor-icons/react";
+
+function formatRange(range: DateRange | undefined) {
+  if (!range?.from) return "Select dates";
+  if (!range.to) return range.from.toLocaleDateString();
+  return `${range.from.toLocaleDateString()} – ${range.to.toLocaleDateString()}`;
+}
 
 /**
  * Single date selection.
@@ -115,26 +128,33 @@ export function DatePickerPopoverDemo() {
  * Date range picker composed with a Popover for dropdown behavior.
  */
 export function DatePickerRangePopoverDemo() {
+  const [open, setOpen] = useState(false);
   const [range, setRange] = useState<DateRange | undefined>();
-
-  const formatRange = () => {
-    if (!range?.from) return "Select dates";
-    if (!range.to) return range.from.toLocaleDateString();
-    return `${range.from.toLocaleDateString()} – ${range.to.toLocaleDateString()}`;
-  };
+  const [draftRange, setDraftRange] = useState<DateRange | undefined>();
 
   return (
-    <Popover>
+    <Popover
+      open={open}
+      onOpenChange={(nextOpen) => {
+        setOpen(nextOpen);
+        setDraftRange(range);
+      }}
+    >
       <Popover.Trigger asChild>
         <Button variant="outline" icon={CalendarDotsIcon}>
-          {formatRange()}
+          {formatRange(range)}
         </Button>
       </Popover.Trigger>
       <Popover.Content className="p-3">
         <DatePicker
           mode="range"
-          selected={range}
-          onChange={setRange}
+          selected={draftRange}
+          onChange={setDraftRange}
+          onRangeComplete={(nextRange) => {
+            setRange(nextRange);
+            setOpen(false);
+          }}
+          rangeSelectionBehavior="restart"
           numberOfMonths={2}
         />
       </Popover.Content>
@@ -146,7 +166,9 @@ export function DatePickerRangePopoverDemo() {
  * Date range picker with preset options in a popover.
  */
 export function DatePickerRangeWithPresetsDemo() {
+  const [open, setOpen] = useState(false);
   const [range, setRange] = useState<DateRange | undefined>();
+  const [draftRange, setDraftRange] = useState<DateRange | undefined>();
   const [month, setMonth] = useState<Date>(new Date());
 
   const today = new Date();
@@ -195,6 +217,8 @@ export function DatePickerRangeWithPresetsDemo() {
 
   const handlePresetClick = (preset: { range: DateRange }) => {
     setRange(preset.range);
+    setDraftRange(preset.range);
+    setOpen(false);
     // Navigate calendar to show the start of the range
     if (preset.range.from) {
       setMonth(preset.range.from);
@@ -211,17 +235,20 @@ export function DatePickerRangeWithPresetsDemo() {
     return sameFrom && sameTo;
   };
 
-  const formatRange = () => {
-    if (!range?.from) return "Select dates";
-    if (!range.to) return range.from.toLocaleDateString();
-    return `${range.from.toLocaleDateString()} – ${range.to.toLocaleDateString()}`;
-  };
-
   return (
-    <Popover>
+    <Popover
+      open={open}
+      onOpenChange={(nextOpen) => {
+        setOpen(nextOpen);
+        setDraftRange(range);
+        if (range?.from) {
+          setMonth(range.from);
+        }
+      }}
+    >
       <Popover.Trigger asChild>
         <Button variant="outline" icon={CalendarDotsIcon}>
-          {formatRange()}
+          {formatRange(range)}
         </Button>
       </Popover.Trigger>
       <Popover.Content className="p-0">
@@ -247,8 +274,13 @@ export function DatePickerRangeWithPresetsDemo() {
           <div className="p-3">
             <DatePicker
               mode="range"
-              selected={range}
-              onChange={setRange}
+              selected={draftRange}
+              onChange={setDraftRange}
+              onRangeComplete={(nextRange) => {
+                setRange(nextRange);
+                setOpen(false);
+              }}
+              rangeSelectionBehavior="restart"
               month={month}
               onMonthChange={setMonth}
               numberOfMonths={2}

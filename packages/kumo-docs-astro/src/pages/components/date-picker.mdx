@@ -119,13 +119,26 @@ export default function Example() {
 </ComponentExample>
 
 <Heading level={3}>Date Range with Popover</Heading>
-<p>A date range picker in a popover with two months displayed.</p>
+<p>
+  A date range picker in a popover with two months displayed. Use{" "}
+  <code class="rounded bg-kumo-control px-1 py-0.5 text-sm">
+    rangeSelectionBehavior="restart"
+  </code>{" "}
+  so the third click starts a fresh draft, then commit the range with{" "}
+  <code class="rounded bg-kumo-control px-1 py-0.5 text-sm">
+    onRangeComplete
+  </code>{" "}
+  to close the popover immediately.
+</p>
 <ComponentExample demo="DatePickerRangePopoverDemo">
   <DatePickerRangePopoverDemo client:load />
 </ComponentExample>
 
 <Heading level={3}>Date Range with Presets</Heading>
-<p>Combine the date picker with preset options for quick selection.</p>
+<p>
+  Combine the date picker with preset options for quick selection while keeping
+  the committed value stable until the next full range is confirmed.
+</p>
 <ComponentExample demo="DatePickerRangeWithPresetsDemo">
   <DatePickerRangeWithPresetsDemo client:load />
 </ComponentExample>
@@ -192,6 +205,8 @@ export function DatePickerDropdown() {
     <li>`numberOfMonths` — Number of months to display</li>
     <li>`disabled` — Dates that cannot be selected</li>
     <li>`min` / `max` — Min/max selection constraints</li>
+    <li>`rangeSelectionBehavior` — In range mode, choose between default editing and restart-on-next-click behavior</li>
+    <li>`onRangeComplete` — In range mode, fires once both `from` and `to` are selected</li>
     <li>`footer` — Content rendered below the calendar</li>
     <li>`locale` — date-fns locale for internationalization</li>
     <li>`className` — Additional CSS classes</li>
