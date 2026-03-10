@@ -1,10 +1,16 @@
 ---
+/**
+ * [INPUT]: 依赖 DocLayout、ComponentExample、DatePickerDemo 示例组件
+ * [OUTPUT]: 对外提供 DatePicker 文档页，说明单选、多选、范围与 popover 组合模式
+ * [POS]: docs/components 的 DatePicker 展示页，负责把推荐交互同步成公开文档
+ * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ */
+
 import DocLayout from "../../layouts/DocLayout.astro";
 import Heading from "../../components/docs/Heading.astro";
 import ComponentSection from "../../components/docs/ComponentSection.astro";
 import ComponentExample from "../../components/docs/ComponentExample.astro";
 import CodeBlock from "../../components/docs/CodeBlock.astro";
-import PropsTable from "../../components/docs/PropsTable.astro";
 import {
   DatePickerSingleDemo,
   DatePickerMultipleDemo,
@@ -185,20 +191,33 @@ export default function Example() {
     <div class="mb-12">
       <Heading level={3}>Date Range with Popover</Heading>
       <p class="mb-3 text-sm text-kumo-strong">
-        A date range picker in a popover with two months displayed.
+        A date range picker in a popover with two months displayed. The range is
+        committed on the second click and the popover closes immediately.
       </p>
       <ComponentExample
-        code={`<Popover>
+        code={`const [open, setOpen] = useState(false);
+const [range, setRange] = useState<DateRange>();
+const [draftRange, setDraftRange] = useState<DateRange>();
+
+<Popover open={open} onOpenChange={(nextOpen) => {
+  setOpen(nextOpen);
+  setDraftRange(range);
+}}>
   <Popover.Trigger asChild>
     <Button variant="outline" icon={CalendarDotsIcon}>
-      {formatRange()}
+      {formatRange(range)}
     </Button>
   </Popover.Trigger>
   <Popover.Content className="p-1">
     <DatePicker
       mode="range"
-      selected={range}
-      onChange={(r) => setRange(r)}
+      selected={draftRange}
+      onChange={setDraftRange}
+      rangeSelectionBehavior="restart"
+      onRangeComplete={(nextRange) => {
+        setRange(nextRange);
+        setOpen(false);
+      }}
       numberOfMonths={2}
     />
   </Popover.Content>
@@ -212,13 +231,17 @@ export default function Example() {
     <div class="mb-12">
       <Heading level={3}>Date Range with Presets</Heading>
       <p class="mb-3 text-sm text-kumo-strong">
-        Combine the date picker with preset options for quick selection.
+        Combine the date picker with preset options for quick selection while
+        keeping the committed value stable until the next range is confirmed.
       </p>
       <ComponentExample
-        code={`<Popover>
+        code={`<Popover open={open} onOpenChange={(nextOpen) => {
+  setOpen(nextOpen);
+  setDraftRange(range);
+}}>
   <Popover.Trigger asChild>
     <Button variant="outline" icon={CalendarDotsIcon}>
-      {formatRange()}
+      {formatRange(range)}
     </Button>
   </Popover.Trigger>
   <Popover.Content className="p-0">
@@ -237,8 +260,13 @@ export default function Example() {
       <div className="p-1">
         <DatePicker
           mode="range"
-          selected={range}
-          onChange={(r) => setRange(r)}
+          selected={draftRange}
+          onChange={setDraftRange}
+          rangeSelectionBehavior="restart"
+          onRangeComplete={(nextRange) => {
+            setRange(nextRange);
+            setOpen(false);
+          }}
           numberOfMonths={2}
         />
       </div>

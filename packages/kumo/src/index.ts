@@ -199,6 +199,7 @@ export {
 export {
   DatePicker,
   type DatePickerProps,
+  type DatePickerRangeSelectionBehavior,
   type DateRange,
   type DayPickerProps,
 } from "./components/date-picker";
