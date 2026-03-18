@@ -139,6 +139,11 @@ function EyeDropperButton() {
 /* ========================================================================
    ColorPicker Component
    ======================================================================== */
+/**
+ * ColorPicker — hex color selection with popover panel. Features an HSB color area,
+ * hue slider, multi-format input (HEX/RGB/HSL/HSB), and EyeDropper integration where
+ * supported. External API is hex-in hex-out.
+ */
 export function ColorPicker({
   value,
   onChange,
@@ -153,9 +158,11 @@ export function ColorPicker({
   );
   const channels =
     colorSpace === "hex" ? null : COLOR_SPACE_CHANNELS[colorSpace];
-  const triggerSwatchClassName = showValue
-    ? "size-6 shrink-0 rounded-md ring ring-kumo-line"
-    : "h-5 w-full rounded-md ring ring-kumo-line";
+  const triggerSwatchClassName = "size-6 shrink-0 rounded-md ring ring-kumo-line";
+  const triggerClassName = "h-10 justify-start rounded-lg px-2 text-left font-normal";
+  const triggerContentClassName = showValue
+    ? "flex min-w-0 items-center gap-2"
+    : "flex items-center";
 
   const handleColorChange = (newColor: ColorPickerInternalColor) => {
     setInternalColor(newColor);
@@ -200,11 +207,11 @@ export function ColorPicker({
             variant="outline"
             disabled={disabled}
             className={cn(
-              "w-full justify-start rounded-lg px-2 text-left font-normal",
+              triggerClassName,
               className,
             )}
           >
-            <div className="flex w-full items-center gap-2">
+            <div className={triggerContentClassName}>
               <ColorSwatch color={internalColor} className={triggerSwatchClassName} />
               {showValue && (
                 <span className="truncate font-mono text-sm uppercase text-kumo-subtle">

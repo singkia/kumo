@@ -260,6 +260,13 @@ export const ADDITIONAL_COMPONENT_PROPS: Record<
       description: "Callback when checkbox value changes",
     },
   },
+  ColorPicker: {
+    onChange: {
+      type: "(hex: string) => void",
+      description:
+        "Fires whenever a new color is committed; emits normalized hex output.",
+    },
+  },
 };
 
 // =============================================================================

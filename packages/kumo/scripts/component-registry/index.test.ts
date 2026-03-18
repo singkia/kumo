@@ -7,6 +7,7 @@
  */
 
 import { describe, it, expect } from "vitest";
+import { ADDITIONAL_COMPONENT_PROPS } from "./metadata.js";
 
 // =============================================================================
 // Tests for string transformation utilities
@@ -255,6 +256,16 @@ describe("extractStateClasses", () => {
     const classes = "hover:bg-kumo-brand hover:text-white";
     expect(extractStateClasses(classes)).toEqual({
       hover: "hover:bg-kumo-brand hover:text-white",
+    });
+  });
+});
+
+describe("additional component metadata", () => {
+  it("injects ColorPicker callback props that schema extraction misses", () => {
+    expect(ADDITIONAL_COMPONENT_PROPS.ColorPicker).toMatchObject({
+      onChange: {
+        type: "(hex: string) => void",
+      },
     });
   });
 });

@@ -1,0 +1,126 @@
+---
+layout: ~/layouts/MdxDocLayout.astro
+title: "Color Picker"
+description: "A hex color selection popover with an HSB color area, hue slider, format switching, and EyeDropper support where available."
+sourceFile: "components/color-picker"
+---
+
+import ComponentExample from "~/components/docs/ComponentExample.astro";
+import ComponentSection from "~/components/docs/ComponentSection.astro";
+import CodeBlock from "~/components/docs/CodeBlock.astro";
+import Heading from "~/components/docs/Heading.astro";
+import PropsTable from "~/components/docs/PropsTable.astro";
+import {
+  ColorPickerBasicDemo,
+  ColorPickerControlledDemo,
+  ColorPickerSwatchOnlyDemo,
+  ColorPickerDisabledDemo,
+  ColorPickerFormatDemo,
+} from "~/components/demos/ColorPickerDemo";
+
+<ComponentSection>
+  <ComponentExample demo="ColorPickerBasicDemo">
+    <ColorPickerBasicDemo client:load />
+  </ComponentExample>
+</ComponentSection>
+
+<ComponentSection>
+  <Heading level={2}>Installation</Heading>
+  <Heading level={3}>Barrel</Heading>
+  <CodeBlock code={`import { ColorPicker } from "@cloudflare/kumo";`} lang="tsx" />
+  <Heading level={3}>Granular</Heading>
+  <CodeBlock
+    code={`import { ColorPicker } from "@cloudflare/kumo/components/color-picker";`}
+    lang="tsx"
+  />
+</ComponentSection>
+
+<ComponentSection>
+  <Heading level={2}>Usage</Heading>
+  <p>
+    <code class="rounded bg-kumo-control px-1 py-0.5 text-sm">ColorPicker</code>{" "}
+    keeps its external API in hex format. The trigger shows the current color,
+    and the popover provides an HSB color area, hue slider, format switching,
+    and a hex input that commits on{" "}
+    <code class="rounded bg-kumo-control px-1 py-0.5 text-sm">Enter</code> or
+    blur.
+  </p>
+
+```tsx
+import { ColorPicker } from "@cloudflare/kumo";
+import { useState } from "react";
+
+export default function Example() {
+  const [value, setValue] = useState("#F48120");
+
+  return <ColorPicker value={value} onChange={setValue} />;
+}
+```
+
+  <p>
+    EyeDropper support is progressive enhancement. When the browser exposes the
+    API, the panel shows a pick-from-screen action; unsupported browsers still
+    keep the rest of the picker working.
+  </p>
+</ComponentSection>
+
+<ComponentSection>
+  <Heading level={2}>Examples</Heading>
+
+  <Heading level={3}>Basic</Heading>
+  <p>
+    The default trigger shows both the swatch and the committed hex value.
+  </p>
+  <ComponentExample demo="ColorPickerBasicDemo">
+    <ColorPickerBasicDemo client:load />
+  </ComponentExample>
+
+  <Heading level={3}>Controlled Value</Heading>
+  <p>
+    Keep the picker controlled from React state when the selected color also
+    drives surrounding UI.
+  </p>
+  <ComponentExample demo="ColorPickerControlledDemo">
+    <ColorPickerControlledDemo client:load />
+  </ComponentExample>
+
+  <Heading level={3}>Swatch Only</Heading>
+  <p>
+    Use{" "}
+    <code class="rounded bg-kumo-control px-1 py-0.5 text-sm">
+      showValue={"{false}"}
+    </code>{" "}
+    when the trigger should render only the swatch.
+  </p>
+  <ComponentExample demo="ColorPickerSwatchOnlyDemo">
+    <ColorPickerSwatchOnlyDemo client:load />
+  </ComponentExample>
+
+  <Heading level={3}>Disabled</Heading>
+  <p>
+    Disabled state keeps the current color visible while preventing the popover
+    from opening.
+  </p>
+  <ComponentExample demo="ColorPickerDisabledDemo">
+    <ColorPickerDisabledDemo client:load />
+  </ComponentExample>
+
+  <Heading level={3}>Format Switching And Hex Commit</Heading>
+  <p>
+    The panel can switch between HEX, RGB, HSL, and HSB views. Regardless of
+    the active panel format, committed output stays normalized hex.
+  </p>
+  <p>
+    Switch the panel format, then commit a hex value with{" "}
+    <code class="rounded bg-kumo-control px-1 py-0.5 text-sm">Enter</code> or
+    blur to update the controlled value.
+  </p>
+  <ComponentExample demo="ColorPickerFormatDemo">
+    <ColorPickerFormatDemo client:load />
+  </ComponentExample>
+</ComponentSection>
+
+<ComponentSection>
+  <Heading level={2}>API Reference</Heading>
+  <PropsTable component="ColorPicker" />
+</ComponentSection>

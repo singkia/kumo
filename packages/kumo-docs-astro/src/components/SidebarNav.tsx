@@ -47,6 +47,7 @@ const componentItems: NavItem[] = [
   { label: "Cloudflare Logo", href: "/components/cloudflare-logo" },
   { label: "CodeHighlighted", href: "/components/code-highlighted" },
   { label: "Collapsible", href: "/components/collapsible" },
+  { label: "Color Picker", href: "/components/color-picker" },
   { label: "Combobox", href: "/components/combobox" },
   { label: "Command Palette", href: "/components/command-palette" },
   { label: "Date Picker", href: "/components/date-picker" },

@@ -46,6 +46,7 @@ export const CATEGORY_MAP: Record<string, string> = {
   toast: "Feedback",
   // Input
   checkbox: "Input",
+  "color-picker": "Input",
   combobox: "Input",
   "date-range-picker": "Input",
   field: "Input",

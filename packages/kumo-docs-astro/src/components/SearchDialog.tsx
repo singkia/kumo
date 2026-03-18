@@ -135,6 +135,8 @@ const COMPONENT_DESCRIPTIONS: Record<string, string> = {
   "clipboard-text": "A text component with a copy-to-clipboard button.",
   collapsible:
     "A vertically stacked set of interactive headings that each reveal content.",
+  "color-picker":
+    "A color selection popover with HSB area, hue slider, format switching, and EyeDropper support where available.",
   combobox:
     "A searchable select component for filtering and selecting from options.",
   dialog: "A modal window overlaid on the primary window or another dialog.",
