@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import { useState } from "react";
 import { Select } from "./select";
 
@@ -288,6 +288,27 @@ describe("Select", () => {
       );
 
       expect(screen.getByText("Choose a database")).toBeTruthy();
+    });
+  });
+
+  describe("popup scroll behavior", () => {
+    it("renders a scrollable popup container", () => {
+      render(
+        <Select aria-label="Select a country">
+          <Select.Option value="af">Afghanistan</Select.Option>
+          <Select.Option value="al">Albania</Select.Option>
+        </Select>,
+      );
+
+      act(() => {
+        fireEvent.click(screen.getByRole("combobox"));
+      });
+
+      const listbox = screen.getByRole("listbox");
+      expect(listbox.className).toContain("relative");
+      expect(listbox.className).toContain("max-h-full");
+      expect(listbox.className).toContain("overflow-x-hidden");
+      expect(listbox.className).toContain("overflow-y-auto");
     });
   });
 });
