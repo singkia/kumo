@@ -1,10 +1,3 @@
-/**
- * [INPUT]: 依赖 testing-library 与 kumo 的 DatePicker/Popover/Button 组件，验证 rangeSelectionBehavior 的交互语义
- * [OUTPUT]: 对外提供 DatePicker range 模式的回归测试，覆盖 restart 草稿流与 popover 关闭时机
- * [POS]: components/date-picker 的行为护栏，防止第三击悄悄篡改已确认范围
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
- */
-
 import { useState } from "react";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";

@@ -1,10 +1,3 @@
-/**
- * [INPUT]: 依赖 react-day-picker 的 DayPicker、DateRange、addToRange、rangeContainsModifiers，依赖 ../../utils/cn 的样式合并能力
- * [OUTPUT]: 对外提供 DatePicker 组件与 DatePickerProps 类型，补充可预测的 range 选择模式与完成回调
- * [POS]: components/date-picker 的核心适配层，负责把 react-day-picker 的选择语义收敛成 Kumo API
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
- */
-
 import { CaretLeftIcon, CaretRightIcon } from "@phosphor-icons/react";
 import {
   DayPicker,
