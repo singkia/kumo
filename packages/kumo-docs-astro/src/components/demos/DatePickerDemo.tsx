@@ -1,12 +1,5 @@
 "use client";
 
-/**
- * [INPUT]: 依赖 react 的 useState，依赖 @cloudflare/kumo 的 DatePicker/Popover/Button 组合能力
- * [OUTPUT]: 对外提供 DatePicker 文档页的所有 demo 组件
- * [POS]: kumo-docs-astro/components/demos 的 DatePicker 示例集合，展示推荐交互而不是底层原始状态机
- * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
- */
-
 import { useState } from "react";
 import { DatePicker, Popover, Button, type DateRange } from "@cloudflare/kumo";
 import { CalendarDotsIcon } from "@phosphor-icons/react";
