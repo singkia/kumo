@@ -309,6 +309,7 @@ describe("Select", () => {
       expect(listbox.className).toContain("max-h-[var(--available-height)]");
       expect(listbox.className).toContain("overflow-x-hidden");
       expect(listbox.className).toContain("overflow-y-auto");
+      expect(listbox.className).toContain("overscroll-y-none");
     });
   });
 });

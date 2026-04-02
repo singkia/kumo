@@ -1,3 +1,9 @@
+/**
+ * [INPUT]: 依赖 @base-ui/react/select 的弹出层与选项能力，依赖 button/field/loader/portal-provider 的 Kumo 样式与容器能力
+ * [OUTPUT]: 对外提供 Select 组件、Select.Option 子组件、KUMO_SELECT_* 元数据与样式工具
+ * [POS]: components/select 的核心实现，负责触发器、弹层、选项渲染与 Field 集成
+ * [PROTOCOL]: 变更时更新此头部，然后检查 CLAUDE.md
+ */
 import { Select as SelectBase } from "@base-ui/react/select";
 import { CaretUpDownIcon, CheckIcon } from "@phosphor-icons/react";
 import { useId } from "react";
@@ -309,7 +315,7 @@ export function Select<T, Multiple extends boolean | undefined = false>({
         <SelectBase.Positioner>
           <SelectBase.Popup
             className={cn(
-              "relative max-h-[var(--available-height)] overflow-x-hidden overflow-y-auto bg-kumo-base text-kumo-default", // background + scroll behavior
+              "relative max-h-[var(--available-height)] overflow-x-hidden overflow-y-auto overscroll-y-none bg-kumo-base text-kumo-default", // background + scroll behavior
               "rounded-lg shadow-lg ring ring-kumo-ring", // border part
               // 3px adjustment to account for padding + border differences
               "min-w-[calc(var(--anchor-width)+3px)] p-1.5", // spacing
