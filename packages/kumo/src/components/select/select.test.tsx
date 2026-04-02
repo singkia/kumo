@@ -292,7 +292,7 @@ describe("Select", () => {
   });
 
   describe("popup scroll behavior", () => {
-    it("renders a scrollable popup container", () => {
+    it("uses Base UI available height for the popup scroll container", () => {
       render(
         <Select aria-label="Select a country">
           <Select.Option value="af">Afghanistan</Select.Option>
@@ -306,7 +306,7 @@ describe("Select", () => {
 
       const listbox = screen.getByRole("listbox");
       expect(listbox.className).toContain("relative");
-      expect(listbox.className).toContain("max-h-full");
+      expect(listbox.className).toContain("max-h-[var(--available-height)]");
       expect(listbox.className).toContain("overflow-x-hidden");
       expect(listbox.className).toContain("overflow-y-auto");
     });
