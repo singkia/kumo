@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { DatePicker, Popover, Button, type DateRange } from "@cloudflare/kumo";
+import { DatePicker, Popover, Button, type DateRange, type DatePickerProps } from "@cloudflare/kumo";
 import { CalendarDotsIcon } from "@phosphor-icons/react";
 
 function formatRange(range: DateRange | undefined) {
@@ -140,15 +140,17 @@ export function DatePickerRangePopoverDemo() {
       </Popover.Trigger>
       <Popover.Content className="p-3">
         <DatePicker
-          mode="range"
-          selected={draftRange}
-          onChange={setDraftRange}
-          onRangeComplete={(nextRange) => {
-            setRange(nextRange);
-            setOpen(false);
-          }}
-          rangeSelectionBehavior="restart"
-          numberOfMonths={2}
+          {...({
+            mode: "range",
+            selected: draftRange,
+            onChange: setDraftRange,
+            onRangeComplete: (nextRange) => {
+              setRange(nextRange);
+              setOpen(false);
+            },
+            rangeSelectionBehavior: "restart",
+            numberOfMonths: 2,
+          } satisfies DatePickerProps)}
         />
       </Popover.Content>
     </Popover>
@@ -266,17 +268,19 @@ export function DatePickerRangeWithPresetsDemo() {
           </div>
           <div className="p-3">
             <DatePicker
-              mode="range"
-              selected={draftRange}
-              onChange={setDraftRange}
-              onRangeComplete={(nextRange) => {
-                setRange(nextRange);
-                setOpen(false);
-              }}
-              rangeSelectionBehavior="restart"
-              month={month}
-              onMonthChange={setMonth}
-              numberOfMonths={2}
+              {...({
+                mode: "range",
+                selected: draftRange,
+                onChange: setDraftRange,
+                onRangeComplete: (nextRange) => {
+                  setRange(nextRange);
+                  setOpen(false);
+                },
+                rangeSelectionBehavior: "restart",
+                month,
+                onMonthChange: setMonth,
+                numberOfMonths: 2,
+              } satisfies DatePickerProps)}
             />
           </div>
         </div>

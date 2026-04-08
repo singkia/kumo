@@ -14,8 +14,12 @@ import {
   type PropsSingle,
   type PropsSingleRequired,
 } from "react-day-picker";
-import type { KeyboardEvent as ReactKeyboardEvent, MouseEvent as ReactMouseEvent } from "react";
-import { useEffect, useState } from "react";
+import {
+  useEffect,
+  useState,
+  type KeyboardEvent as ReactKeyboardEvent,
+  type MouseEvent as ReactMouseEvent,
+} from "react";
 import { cn } from "../../utils/cn";
 
 /**
@@ -26,12 +30,28 @@ const Chevron: CustomComponents["Chevron"] = ({ orientation, ...props }) => {
   return <Icon size={16} {...props} />;
 };
 
+export type DatePickerRangeSelectionBehavior = "default" | "restart";
+
 /** Base props shared across all DatePicker modes */
 type BaseProps = Omit<PropsBase, "classNames"> & {
   /** Additional CSS classes merged via `cn()`. */
   className?: string;
   /** Custom class names for internal elements */
   classNames?: PropsBase["classNames"];
+  /**
+   * Controls how a completed range reacts to the next click.
+   * Only applies when `mode="range"`.
+   * - `"default"` — Keep extending/editing the current range like react-day-picker
+   * - `"restart"` — Treat the next click as the start of a new draft range
+   * @default "default"
+   */
+  rangeSelectionBehavior?: DatePickerRangeSelectionBehavior;
+  /**
+   * Fired when a range selection becomes complete (`from` and `to` are both set).
+   * Only applies when `mode="range"`.
+   * Useful for composed popover pickers that should close once the range is confirmed.
+   */
+  onRangeComplete?: (range: DateRange) => void;
 };
 
 /** Single date selection (optional) */
@@ -58,33 +78,13 @@ type MultipleRequiredProps = BaseProps &
     onChange?: PropsMultiRequired["onSelect"];
   };
 
-/** Date range selection (optional) */
-export type DatePickerRangeSelectionBehavior = "default" | "restart";
-
-type RangeBehaviorProps = {
-  /**
-   * Controls how a completed range reacts to the next click.
-   * - `"default"` — Keep extending/editing the current range like react-day-picker
-   * - `"restart"` — Treat the next click as the start of a new draft range
-   * @default "default"
-   */
-  rangeSelectionBehavior?: DatePickerRangeSelectionBehavior;
-  /**
-   * Fired when a range selection becomes complete (`from` and `to` are both set).
-   * Useful for composed popover pickers that should close once the range is confirmed.
-   */
-  onRangeComplete?: (range: DateRange) => void;
-};
-
 type RangeProps = BaseProps &
-  RangeBehaviorProps &
   Omit<PropsRange, "onSelect" | "classNames"> & {
     onChange?: PropsRange["onSelect"];
   };
 
 /** Date range selection (required) */
 type RangeRequiredProps = BaseProps &
-  RangeBehaviorProps &
   Omit<PropsRangeRequired, "onSelect" | "classNames"> & {
     onChange?: PropsRangeRequired["onSelect"];
   };
@@ -108,14 +108,6 @@ function isRangePickerProps(
   return props.mode === "range";
 }
 
-function isRestartingRangePickerProps(
-  props: DatePickerProps,
-): props is RangeProps | RangeRequiredProps {
-  return (
-    isRangePickerProps(props) && props.rangeSelectionBehavior === "restart"
-  );
-}
-
 function getNextRestartingRange(
   triggerDate: Date,
   selectedRange: DateRange | undefined,
@@ -123,9 +115,8 @@ function getNextRestartingRange(
 ) {
   let nextRange: DateRange | undefined;
 
-  if (!selectedRange?.from && !selectedRange?.to) {
-    nextRange = { from: triggerDate, to: undefined };
-  } else if (selectedRange?.from && selectedRange.to) {
+  // Empty range or completed range: start a new draft from the clicked date
+  if (!selectedRange?.from || selectedRange.to) {
     nextRange = { from: triggerDate, to: undefined };
   } else {
     nextRange = addToRange(
@@ -151,6 +142,71 @@ function getNextRestartingRange(
   }
 
   return nextRange;
+}
+
+/**
+ * Internal component for range pickers with restart behavior.
+ * Isolated so that the uncontrolled-range state and sync effect
+ * are only mounted when actually needed.
+ */
+function RestartingRangePicker({
+  className,
+  classNames,
+  ...props
+}: RangeProps | RangeRequiredProps) {
+  const { onChange, onRangeComplete, rangeSelectionBehavior: _, ...rest } = props;
+  const controlledRange = props.selected;
+  const [uncontrolledRange, setUncontrolledRange] = useState<
+    DateRange | undefined
+  >(controlledRange);
+
+  const shouldSync = !onChange;
+  useEffect(() => {
+    if (shouldSync) {
+      setUncontrolledRange(controlledRange);
+    }
+  }, [controlledRange, shouldSync]);
+
+  const selectedRange = onChange ? controlledRange : uncontrolledRange;
+
+  return (
+    <DayPicker
+      showOutsideDays
+      animate
+      {...rest}
+      selected={selectedRange}
+      onSelect={(
+        _: DateRange | undefined,
+        triggerDate: Date,
+        modifiers: Modifiers,
+        event: ReactMouseEvent | ReactKeyboardEvent,
+      ) => {
+        const nextRange = getNextRestartingRange(triggerDate, selectedRange, props);
+
+        if (!onChange) {
+          setUncontrolledRange(nextRange);
+        }
+
+        (onChange as RangeProps["onChange"])?.(nextRange, triggerDate, modifiers, event);
+
+        if (nextRange?.from && nextRange.to) {
+          onRangeComplete?.({ from: nextRange.from, to: nextRange.to });
+        }
+      }}
+      classNames={{
+        ...classNames,
+        root: cn(
+          "rdp-root select-none rounded-xl bg-kumo-base",
+          classNames?.root,
+          className,
+        ),
+      }}
+      components={{
+        Chevron,
+        ...rest.components,
+      }}
+    />
+  );
 }
 
 /**
@@ -180,81 +236,45 @@ export function DatePicker({
   onChange,
   ...props
 }: DatePickerProps) {
-  const controlledRange = isRangePickerProps(props) ? props.selected : undefined;
-  const shouldSyncControlledRange = isRangePickerProps(props) && !onChange;
-  const [uncontrolledRange, setUncontrolledRange] = useState<
-    DateRange | undefined
-  >(
-    controlledRange,
-  );
-
-  useEffect(() => {
-    if (shouldSyncControlledRange) {
-      setUncontrolledRange(controlledRange);
-    }
-  }, [controlledRange, shouldSyncControlledRange]);
-
-  if (isRestartingRangePickerProps(props)) {
-    const selectedRange = onChange ? controlledRange : uncontrolledRange;
-    const rangeOnChange = onChange as
-      | ((
-          selected: DateRange | undefined,
-          triggerDate: Date,
-          modifiers: Modifiers,
-          event: ReactMouseEvent | ReactKeyboardEvent,
-        ) => void)
-      | undefined;
-
+  if (isRangePickerProps(props) && props.rangeSelectionBehavior === "restart") {
     return (
-      <DayPicker
-        showOutsideDays
-        animate
+      <RestartingRangePicker
+        className={className}
+        classNames={classNames}
+        onChange={onChange as RangeProps["onChange"]}
         {...props}
-        selected={selectedRange}
-        onSelect={(
-          _: DateRange | undefined,
-          triggerDate: Date,
-          modifiers: Modifiers,
-          event: ReactMouseEvent | ReactKeyboardEvent,
-        ) => {
-          const nextRange = getNextRestartingRange(
-            triggerDate,
-            selectedRange,
-            props,
-          );
-
-          if (!onChange) {
-            setUncontrolledRange(nextRange);
-          }
-
-          rangeOnChange?.(nextRange, triggerDate, modifiers, event);
-
-          if (nextRange?.from && nextRange.to) {
-            props.onRangeComplete?.(nextRange);
-          }
-        }}
-        classNames={{
-          ...classNames,
-          root: cn(
-            "rdp-root select-none rounded-xl bg-kumo-base",
-            classNames?.root,
-            className,
-          ),
-        }}
-        components={{
-          Chevron,
-          ...props.components,
-        }}
       />
     );
   }
+
+  // For range pickers with default behavior, wrap onSelect to fire onRangeComplete
+  let onSelect: DatePickerProps["onChange"] = onChange;
+  if (isRangePickerProps(props) && props.onRangeComplete) {
+    const { onRangeComplete, rangeSelectionBehavior: _, ...rangeRest } = props;
+    const rangeOnChange = onChange as RangeProps["onChange"];
+    onSelect = ((
+      selected: DateRange | undefined,
+      triggerDate: Date,
+      modifiers: Modifiers,
+      event: ReactMouseEvent | ReactKeyboardEvent,
+    ) => {
+      rangeOnChange?.(selected, triggerDate, modifiers, event);
+      if (selected?.from && selected.to) {
+        onRangeComplete({ from: selected.from, to: selected.to });
+      }
+    }) as DatePickerProps["onChange"];
+    props = rangeRest as typeof props;
+  }
+
+  // Strip range-specific props that DayPicker doesn't understand
+  const { onRangeComplete: _orc, rangeSelectionBehavior: _rsb, ...dayPickerProps } = props;
 
   return (
     <DayPicker
       showOutsideDays
       animate
-      {...props}
-      onSelect={onChange as never}
+      {...dayPickerProps}
+      onSelect={onSelect as never}
       classNames={{
         ...classNames,
         root: cn(
@@ -265,7 +285,7 @@ export function DatePicker({
       }}
       components={{
         Chevron,
-        ...props.components,
+        ...dayPickerProps.components,
       }}
     />
   );
