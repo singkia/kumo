@@ -1,23 +1,32 @@
-import { describe, expect, it, vi } from "vitest";
-import { createLegacyCheckboxChangeEvent } from "./checkbox";
+import { fireEvent, render, screen } from "@testing-library/react";
+import { describe, expect, it } from "vitest";
+import { Checkbox } from "./checkbox";
 
 describe("Checkbox", () => {
   it("preserves native event APIs on deprecated onChange callbacks", () => {
-    const nativeEvent = new MouseEvent("click", { cancelable: true });
-    const onChange = vi.fn((event: React.ChangeEvent<HTMLInputElement>) => {
-      expect(event.target.checked).toBe(true);
-      expect(event.currentTarget.checked).toBe(true);
-      expect(event instanceof Event).toBe(true);
+    const events: Array<React.ChangeEvent<HTMLInputElement>> = [];
 
-      event.preventDefault();
+    render(
+      <Checkbox
+        label="Accept terms"
+        onChange={(event) => {
+          events.push(event);
+        }}
+      />,
+    );
 
-      expect(event.defaultPrevented).toBe(true);
-      expect(typeof event.timeStamp).toBe("number");
-    });
+    expect(() => fireEvent.click(screen.getByRole("checkbox"))).not.toThrow();
+    expect(events.length).toBeGreaterThan(0);
 
-    const event = createLegacyCheckboxChangeEvent(nativeEvent, true);
+    const event = events[0];
 
-    expect(() => onChange(event)).not.toThrow();
-    expect(onChange).toHaveBeenCalledWith(event);
+    expect(event).toBeDefined();
+    expect(event.target.checked).toBe(true);
+    expect(event.currentTarget.checked).toBe(true);
+    expect(event instanceof Event).toBe(true);
+
+    expect(() => event.preventDefault()).not.toThrow();
+    expect(event.defaultPrevented).toBe(true);
+    expect(typeof event.timeStamp).toBe("number");
   });
 });

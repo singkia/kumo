@@ -56,48 +56,38 @@ const CheckboxGroupContext = createContext<{ controlFirst: boolean }>({
   controlFirst: true,
 });
 
-type CheckboxLikeTarget = EventTarget & HTMLInputElement;
-
-function createLegacyCheckboxTarget(
-  target: EventTarget | null,
-  checked: boolean,
-): CheckboxLikeTarget {
-  if (!target || (typeof target !== "object" && typeof target !== "function")) {
-    return { checked } as CheckboxLikeTarget;
-  }
-
-  return new Proxy(target as object, {
-    get(targetObject, property) {
-      if (property === "checked") {
-        return checked;
+function brandSafeProxy<T extends object>(
+  source: T,
+  overrides: Record<PropertyKey, unknown>,
+): T {
+  return new Proxy(source, {
+    get(target, property) {
+      if (Object.hasOwn(overrides, property)) {
+        return overrides[property];
       }
 
-      const value = Reflect.get(targetObject, property, targetObject);
-      return typeof value === "function" ? value.bind(targetObject) : value;
+      const value = Reflect.get(target, property, target);
+      return typeof value === "function" ? value.bind(target) : value;
     },
-  }) as CheckboxLikeTarget;
+  });
 }
 
-export function createLegacyCheckboxChangeEvent(
+function createLegacyCheckboxChangeEvent(
   event: Event,
   checked: boolean,
 ): React.ChangeEvent<HTMLInputElement> {
-  const target = createLegacyCheckboxTarget(event.target, checked);
-  const currentTarget = createLegacyCheckboxTarget(event.currentTarget, checked);
+  const target = brandSafeProxy(
+    (event.target ?? {}) as EventTarget & HTMLInputElement,
+    { checked },
+  );
+  const currentTarget = brandSafeProxy(
+    (event.currentTarget ?? {}) as EventTarget & HTMLInputElement,
+    { checked },
+  );
 
-  return new Proxy(event, {
-    get(targetEvent, property) {
-      if (property === "target") {
-        return target;
-      }
-
-      if (property === "currentTarget") {
-        return currentTarget;
-      }
-
-      const value = Reflect.get(targetEvent, property, targetEvent);
-      return typeof value === "function" ? value.bind(targetEvent) : value;
-    },
+  return brandSafeProxy(event, {
+    target,
+    currentTarget,
   }) as unknown as React.ChangeEvent<HTMLInputElement>;
 }
 
