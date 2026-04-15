@@ -2,7 +2,7 @@
 "@cloudflare/kumo": patch
 ---
 
-fix(Checkbox): use Object.create instead of Object.assign to avoid crashing on read-only Event.target
+fix(Checkbox): use Proxy instead of Object.assign to avoid crashing on read-only Event.target
 
 The deprecated `onChange` handler used `Object.assign(event, { target: ... })` which throws
 `TypeError: Cannot set property target of #<Event> which has only a getter` because `Event.target`
