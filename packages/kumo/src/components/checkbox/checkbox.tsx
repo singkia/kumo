@@ -56,6 +56,51 @@ const CheckboxGroupContext = createContext<{ controlFirst: boolean }>({
   controlFirst: true,
 });
 
+type CheckboxLikeTarget = EventTarget & HTMLInputElement;
+
+function createLegacyCheckboxTarget(
+  target: EventTarget | null,
+  checked: boolean,
+): CheckboxLikeTarget {
+  if (!target || (typeof target !== "object" && typeof target !== "function")) {
+    return { checked } as CheckboxLikeTarget;
+  }
+
+  return new Proxy(target as object, {
+    get(targetObject, property) {
+      if (property === "checked") {
+        return checked;
+      }
+
+      const value = Reflect.get(targetObject, property, targetObject);
+      return typeof value === "function" ? value.bind(targetObject) : value;
+    },
+  }) as CheckboxLikeTarget;
+}
+
+export function createLegacyCheckboxChangeEvent(
+  event: Event,
+  checked: boolean,
+): React.ChangeEvent<HTMLInputElement> {
+  const target = createLegacyCheckboxTarget(event.target, checked);
+  const currentTarget = createLegacyCheckboxTarget(event.currentTarget, checked);
+
+  return new Proxy(event, {
+    get(targetEvent, property) {
+      if (property === "target") {
+        return target;
+      }
+
+      if (property === "currentTarget") {
+        return currentTarget;
+      }
+
+      const value = Reflect.get(targetEvent, property, targetEvent);
+      return typeof value === "function" ? value.bind(targetEvent) : value;
+    },
+  }) as unknown as React.ChangeEvent<HTMLInputElement>;
+}
+
 /**
  * Single checkbox component props with accessibility guidance.
  *
@@ -245,9 +290,10 @@ const CheckboxBase = forwardRef<HTMLButtonElement, CheckboxProps>(
       if (onChange) {
         // Backwards compatibility: extend native event with target.checked
         // so existing code using `e.target.checked` continues to work
-        const event = Object.create(eventDetails.event, {
-          target: { value: { checked: newChecked } },
-        });
+        const event = createLegacyCheckboxChangeEvent(
+          eventDetails.event,
+          newChecked,
+        );
         onChange(event as never);
       }
     };
