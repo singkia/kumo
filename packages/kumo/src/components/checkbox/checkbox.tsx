@@ -245,8 +245,8 @@ const CheckboxBase = forwardRef<HTMLButtonElement, CheckboxProps>(
       if (onChange) {
         // Backwards compatibility: extend native event with target.checked
         // so existing code using `e.target.checked` continues to work
-        const event = Object.assign(eventDetails.event, {
-          target: { checked: newChecked },
+        const event = Object.create(eventDetails.event, {
+          target: { value: { checked: newChecked } },
         });
         onChange(event as never);
       }
